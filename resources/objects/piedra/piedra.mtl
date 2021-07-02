@@ -1,0 +1,13 @@
+# Blender MTL File: 'cubo.blend'
+# Material Count: 1
+
+newmtl tierra
+Ns 323.999994
+Ka 0.354545 0.354545 0.354545
+Kd 0.800000 0.800000 0.800000
+Ks 0.263637 0.263637 0.263637
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd piedra/piedra.jpg
