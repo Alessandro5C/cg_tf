@@ -6,6 +6,7 @@
 #include "cam.h"
 
 #include <shader.h>
+#include <texture.h>
  
 // settings
 const i32 SCR_WIDTH = 1280;
@@ -161,6 +162,7 @@ i32 main() {
 	srand(time(NULL));
 	u32 n = 101;
 	std::vector<glm::vec3> positions(n * n);
+	u32 amount = n * n;
 	generate_random(n, -5, 15, 20);
 	load_positions(n, positions);
 
@@ -168,21 +170,18 @@ i32 main() {
 	glm::vec3 lightColor = glm::vec3(1.0f);
 
 	Files* files = new Files();
-	/*Files* files = new Files("bin", "resources/textures", "resources/objects");
-	Files* files = new Files("src/tf",
-		"/home/dwels/Repositorio/CG_TF/resources/textures",
-		"/home/dwels/Repositorio/CG_TF/resources/objects");
-*/
+
 	Shader* mapaShader = new Shader("mapa.vert", "mapa.frag");
 	Shader* modelShader = new Shader("model.vert", "model.frag");
 
-	Model* agua = new Model(files, "piedra/piedra.obj");
-	Model* tierra = new Model(files, "slime/slime.obj");
-	Model* arena = new Model(files, "dirt/dirt.obj");
+	Model* agua = new Model(files, "agua/agua.obj");
+	Model* tierra = new Model(files, "dirt/dirt.obj");
+	Model* arena = new Model(files, "piedra/piedra.obj");
 
 
 	Model* vaca = new Model(files, "cow/cow.obj");
-	Model* slime = new Model(files, "robot/robot.obj");
+	Model* robot = new Model(files, "robot/robot.obj");
+	Model* alien = new Model(files, "alien/alien.obj");
 	Model* sol = new Model(files, "planet/planet.obj");
 
 
@@ -316,6 +315,8 @@ i32 main() {
 		glBindVertexArray(0);
 	}
 	
+	
+	
 	while (!glfwWindowShouldClose(window)) {
 		// per-frame logic
 		f32 currentFrame = glfwGetTime();
@@ -358,20 +359,29 @@ i32 main() {
 		modelShader->setVec3("viewPos", cam->pos);
 
 		// dibujar la vaca
+		u32 naux = (i32)(n + currentFrame) % n;
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(n, matrix[n / 2][n / 2] + 5.0f, n));
+		model = glm::translate(model, 2.0f*glm::vec3(naux, matrix[naux][naux]+1.0f, naux));
+		model = glm::rotate(model, 3.1418f / 4.0f, { 0.0f, 1.0f, 0.0f });
 		model = glm::scale(model, {0.5f, 0.5f, 0.5f});
 		modelShader->setMat4("model", model);
 		vaca->Draw(modelShader);
 		
 		
-		// dibujar el slime
+		// dibujar el robot
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -10.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		model = glm::translate(model, cam->pos + vec3(0.0f, -0.1f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
 		modelShader->setMat4("model", model);
-		slime->Draw(modelShader);
+		robot->Draw(modelShader);
 		
+		// dibujar el alien
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, 2.f*glm::vec3(30.0f, matrix[30][30]+1.0f, 30.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f,  1.0f));
+		modelShader->setMat4("model", model);
+		alien->Draw(modelShader);
+
 		// dibujar el sol
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(n, (n * 2.0f) / 3.0f, n));
@@ -423,9 +433,10 @@ i32 main() {
 	delete agua;
 	delete tierra;
 	delete arena;
+	delete alien;
 
 	delete vaca;
-	delete slime;
+	delete robot;
 	delete modelShader;
 
 	return 0;
